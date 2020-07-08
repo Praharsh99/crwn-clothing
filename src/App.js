@@ -12,14 +12,6 @@ import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
 import { setCurrentUser } from "./redux/user/user.actions";
 
 class App extends React.Component {
-  constructor() {
-    super();
-
-    this.state = {
-      currentUser: null,
-    };
-  }
-
   unsubscribeFromAuth = null;
 
   componentDidMount() {
@@ -57,16 +49,17 @@ class App extends React.Component {
             exact
             path="/signin"
             render={() =>
-              this.state.currentUser ? <Redirect to="/" /> : <SignInAndSignUp />
+              this.props.currentUser ? <Redirect to="/" /> : <SignInAndSignUp />
             }
           />
         </Switch>
+        {console.log(this.props.currentUser)}
       </div>
     );
   }
 }
 
-const mapStateToProps = (user) => ({
+const mapStateToProps = ({ user }) => ({
   currentUser: user.currentUser,
 });
 

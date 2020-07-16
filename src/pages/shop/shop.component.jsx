@@ -2,32 +2,15 @@ import React from "react";
 import { Route } from "react-router-dom";
 import { connect } from "react-redux";
 
-import CollectionsOverview from "./../../components/collections-overview/collections-overview.component";
-import CollectionPage from "./../collection/collection.component";
+import CollectionsOverviewContainer from "./../../components/collections-overview/collections-overview.container";
+import CollectionPageContainer from "./../collection/collection.container";
 
-import {
-  firestore,
-  convertCollectionsSnapshotToMap,
-} from "./../../firebase/firebase.utils";
-import { updateCollection } from "./../../redux/shop/shop.actions";
-import withSpinner from "./../../components/with-spinner/with-spinner.component";
+import { fetchCollectionsStart } from "./../../redux/shop/shop.actions";
 
 import "./shop.styles.scss";
 
-const CollectionsOverviewWithSpinner = withSpinner(CollectionsOverview);
-const CollectionPageWithSpinner = withSpinner(CollectionPage);
-
 class ShopPage extends React.Component {
-  state = {
-    loading: true,
-  };
-
-  unsubscribeFromSnapshot = null;
-
   componentDidMount() {
-    const { updateCollection } = this.props;
-    const collectionRef = firestore.collection("collections");
-
     // This code is used for the observable and the observer patter
     // this.unsubscribeFromSnapshot = collectionRef.onSnapshot(
     //   async (snapShot) => {
@@ -36,33 +19,30 @@ class ShopPage extends React.Component {
     //     this.setState({ loading: false });
     //   }
     // );
-
     // Promise pattern
-    collectionRef.get().then((snapShot) => {
-      const collectionsMap = convertCollectionsSnapshotToMap(snapShot);
-      updateCollection(collectionsMap);
-      this.setState({ loading: false });
-    });
+    // collectionRef.get().then((snapShot) => {
+    //   const collectionsMap = convertCollectionsSnapshotToMap(snapShot);
+    //   updateCollection(collectionsMap);
+    //   this.setState({ loading: false });
+    // });
+
+    const { fetchCollectionsStart } = this.props;
+    fetchCollectionsStart();
   }
 
   render() {
     const { match } = this.props;
-    const { loading } = this.state;
 
     return (
       <div>
         <Route
           exact
           path={`${match.path}`}
-          render={(props) => (
-            <CollectionsOverviewWithSpinner isLoading={loading} {...props} />
-          )}
+          component={CollectionsOverviewContainer}
         />
         <Route
           path={`${match.path}/:categoryId`}
-          render={(props) => (
-            <CollectionPageWithSpinner isLoading={loading} {...props} />
-          )}
+          component={CollectionPageContainer}
         />
       </div>
     );
@@ -70,8 +50,7 @@ class ShopPage extends React.Component {
 }
 
 const mapDispatchToProps = (dispatch) => ({
-  updateCollection: (collectionsMap) =>
-    dispatch(updateCollection(collectionsMap)),
+  fetchCollectionsStart: () => dispatch(fetchCollectionsStart()),
 });
 
 export default connect(null, mapDispatchToProps)(ShopPage);

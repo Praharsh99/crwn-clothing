@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Route } from "react-router-dom";
 import { connect } from "react-redux";
 
@@ -9,45 +9,25 @@ import { fetchCollectionsStart } from "./../../redux/shop/shop.actions";
 
 import "./shop.styles.scss";
 
-class ShopPage extends React.Component {
-  componentDidMount() {
-    // This code is used for the observable and the observer patter
-    // this.unsubscribeFromSnapshot = collectionRef.onSnapshot(
-    //   async (snapShot) => {
-    //     const collectionsMap = convertCollectionsSnapshotToMap(snapShot);
-    //     updateCollection(collectionsMap);
-    //     this.setState({ loading: false });
-    //   }
-    // );
-    // Promise pattern
-    // collectionRef.get().then((snapShot) => {
-    //   const collectionsMap = convertCollectionsSnapshotToMap(snapShot);
-    //   updateCollection(collectionsMap);
-    //   this.setState({ loading: false });
-    // });
-
-    const { fetchCollectionsStart } = this.props;
+const ShopPage = ({ fetchCollectionsStart, match }) => {
+  useEffect(() => {
     fetchCollectionsStart();
-  }
+  }, [fetchCollectionsStart]);
 
-  render() {
-    const { match } = this.props;
-
-    return (
-      <div>
-        <Route
-          exact
-          path={`${match.path}`}
-          component={CollectionsOverviewContainer}
-        />
-        <Route
-          path={`${match.path}/:categoryId`}
-          component={CollectionPageContainer}
-        />
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      <Route
+        exact
+        path={`${match.path}`}
+        component={CollectionsOverviewContainer}
+      />
+      <Route
+        path={`${match.path}/:categoryId`}
+        component={CollectionPageContainer}
+      />
+    </div>
+  );
+};
 
 const mapDispatchToProps = (dispatch) => ({
   fetchCollectionsStart: () => dispatch(fetchCollectionsStart()),
